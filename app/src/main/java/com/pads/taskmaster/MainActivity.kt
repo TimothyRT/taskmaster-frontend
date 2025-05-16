@@ -7,7 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.pads.taskmaster.api.RetrofitClient
+import com.pads.taskmaster.model.Task
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,6 +19,7 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
     
     private val TAG = "MainActivity"
+    private lateinit var navController: NavController
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,11 +33,12 @@ class MainActivity : AppCompatActivity() {
         
         // Example API call using Retrofit
         fetchTasksFromServer()
+        setupNavigation()
     }
     
     private fun fetchTasksFromServer() {
-        RetrofitClient.apiService.getTasks().enqueue(object : Callback<List<Any>> {
-            override fun onResponse(call: Call<List<Any>>, response: Response<List<Any>>) {
+        RetrofitClient.apiService.getTasks().enqueue(object : Callback<List<Task>> {
+            override fun onResponse(call: Call<List<Task>>, response: Response<List<Task>>) {
                 if (response.isSuccessful) {
                     val tasks = response.body()
                     Log.d(TAG, "Tasks fetched successfully: $tasks")
@@ -43,10 +49,22 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             
-            override fun onFailure(call: Call<List<Any>>, t: Throwable) {
+            override fun onFailure(call: Call<List<Task>>, t: Throwable) {
                 Log.e(TAG, "API call failed", t)
                 Toast.makeText(this@MainActivity, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+    
+    private fun setupNavigation() {
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+        
+//        setupActionBarWithNavController(navController)
+    }
+    
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }
