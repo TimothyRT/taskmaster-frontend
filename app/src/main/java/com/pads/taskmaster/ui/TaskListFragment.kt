@@ -87,8 +87,8 @@ class TaskListFragment : Fragment() {
                 findNavController().navigate(action)
             },
             onTaskMarkDone = { task ->
-                // Mark task as done
-                markTaskAsDone(task)
+                // Show confirmation dialog before marking task as done
+                showMarkAsDoneConfirmation(task)
             },
             onTaskDelete = { task ->
                 // Delete task
@@ -216,7 +216,21 @@ class TaskListFragment : Fragment() {
         // Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun markTaskAsDone(task: Task) {
+    private fun showMarkAsDoneConfirmation(task: Task) {
+        // Show confirmation dialog
+        val context = context ?: return
+        
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle("Mark Task as Done")
+            .setMessage("Are you sure you want to mark this task as done?")
+            .setPositiveButton("Mark as Done") { _, _ ->
+                performMarkTaskAsDone(task)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    private fun performMarkTaskAsDone(task: Task) {
         RetrofitClient.apiService.markTaskAsDone(task.id).enqueue(object : Callback<Task> {
             override fun onResponse(call: Call<Task>, response: Response<Task>) {
                 if (response.isSuccessful) {
@@ -233,6 +247,11 @@ class TaskListFragment : Fragment() {
                 // Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+    
+    private fun markTaskAsDone(task: Task) {
+        // This method is now replaced by showMarkAsDoneConfirmation for consistency
+        showMarkAsDoneConfirmation(task)
     }
     
     private fun deleteTask(task: Task) {

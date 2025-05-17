@@ -10,15 +10,15 @@
     android:paddingBottom="@dimen/content_vertical_padding"
     tools:context=".ui.TaskCategoriesFragment">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Taskmaster"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!--    <TextView-->
+    <!--        android:id="@+id/title"-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="Taskmaster"-->
+    <!--        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categoriesRecyclerView"
