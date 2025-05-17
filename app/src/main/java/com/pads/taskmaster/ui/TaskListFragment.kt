@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -52,28 +53,32 @@ class TaskListFragment : Fragment() {
         loadingIndicator = view.findViewById(R.id.loadingIndicator)
         emptyStateView = view.findViewById(R.id.emptyStateView)
 
-        setupViews()
+        // Enable back button in action bar
+        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         setupRecyclerView()
-        setupFab()
-        fetchTasks()
     }
 
-    private fun setupViews() {
+    private fun setupViews(taskAdapter: TaskAdapter) {
         val title = when (args.categoryType) {
             "important" -> "Important Tasks"
             "urgent" -> "Urgent Tasks"
             "regular" -> "Regular Tasks"
             else -> "All Tasks"
         }
-        categoryTitle.text = title
+        Log.d("fuck", taskAdapter.itemCount.toString())
+        categoryTitle.text = title + " (${taskAdapter.itemCount})"
     }
 
     private fun setupRecyclerView() {
+        // Outside of "All tasks", hide the category label as it's basically redundant
+        val showCategoryLabel = args.categoryType == "all"
+        
         taskAdapter = TaskAdapter(
             emptyList(),
             onTaskClick = { task ->
                 // Show task details
-                Toast.makeText(context, "Task: ${task.title}", Toast.LENGTH_SHORT).show()
+                // Toast.makeText(context, "Task: ${task.title}", Toast.LENGTH_SHORT).show()
             },
             onTaskEdit = { task ->
                 // Navigate to edit task form
@@ -88,9 +93,17 @@ class TaskListFragment : Fragment() {
             onTaskDelete = { task ->
                 // Delete task
                 deleteTask(task)
-            }
+            },
+            onTaskPin = { task ->
+                // Toggle pin status
+                toggleTaskPin(task)
+            },
+            showCategoryLabel = showCategoryLabel
         )
         tasksRecyclerView.adapter = taskAdapter
+
+        setupFab()
+        fetchTasks()
     }
     
     private fun setupFab() {
@@ -118,7 +131,7 @@ class TaskListFragment : Fragment() {
         // Show loading state
         showLoading(true)
         
-        // Handle "all" as a special case since the server only has category-specific endpoints
+        // Handle "all" as a special case since the API has only got category-specific endpoints
         if (args.categoryType == "all") {
             RetrofitClient.apiService.getTasks().enqueue(object : Callback<List<Task>> {
                 override fun onResponse(call: Call<List<Task>>, response: Response<List<Task>>) {
@@ -131,6 +144,7 @@ class TaskListFragment : Fragment() {
                                 showEmptyState(false)
                                 taskAdapter.updateTasks(tasks)
                             }
+                            setupViews(taskAdapter)
                         } ?: showError("No tasks returned")
                     } else {
                         Log.e(TAG, "Error fetching tasks: ${response.code()}")
@@ -144,6 +158,7 @@ class TaskListFragment : Fragment() {
                     showError("Network error: ${t.message}")
                 }
             })
+
         } else {
             // Convert category ID to proper format ("important" -> "Important")
             val categoryValue = args.categoryType.capitalize()
@@ -164,6 +179,7 @@ class TaskListFragment : Fragment() {
                         Log.e(TAG, "Error fetching tasks: ${response.code()}")
                         showError("Error fetching tasks: ${response.code()}")
                     }
+                    setupViews(taskAdapter)
                 }
                 
                 override fun onFailure(call: Call<List<Task>>, t: Throwable) {
@@ -197,24 +213,24 @@ class TaskListFragment : Fragment() {
     }
     
     private fun showError(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        // Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun markTaskAsDone(task: Task) {
         RetrofitClient.apiService.markTaskAsDone(task.id).enqueue(object : Callback<Task> {
             override fun onResponse(call: Call<Task>, response: Response<Task>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "Task marked as done", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(context, "Task marked as done", Toast.LENGTH_SHORT).show()
                     fetchTasks() // Refresh the task list
                 } else {
                     Log.e(TAG, "Error marking task as done: ${response.code()}")
-                    Toast.makeText(context, "Error marking task as done", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(context, "Error marking task as done", Toast.LENGTH_SHORT).show()
                 }
             }
             
             override fun onFailure(call: Call<Task>, t: Throwable) {
                 Log.e(TAG, "Failed to mark task as done", t)
-                Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
+                // Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -237,17 +253,63 @@ class TaskListFragment : Fragment() {
         RetrofitClient.apiService.deleteTask(task.id).enqueue(object : Callback<Task> {
             override fun onResponse(call: Call<Task>, response: Response<Task>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "Task deleted", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(context, "Task deleted", Toast.LENGTH_SHORT).show()
                     fetchTasks() // Refresh the task list
                 } else {
                     Log.e(TAG, "Error deleting task: ${response.code()}")
-                    Toast.makeText(context, "Error deleting task", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(context, "Error deleting task", Toast.LENGTH_SHORT).show()
                 }
             }
             
             override fun onFailure(call: Call<Task>, t: Throwable) {
                 Log.e(TAG, "Failed to delete task", t)
-                Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
+                // Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun toggleTaskPin(task: Task) {
+        // Log detailed task information before API call
+        task.logTaskDetails(TAG)
+        Log.d(TAG, "Toggling pin for task: ${task.id}, current isPinned: ${task.isPinned}")
+        
+        // Set up a flag to track expected state after the toggle
+        val expectedPinnedState = !task.isPinned
+        
+        RetrofitClient.apiService.toggleTaskPin(task.id).enqueue(object : Callback<Task> {
+            override fun onResponse(call: Call<Task>, response: Response<Task>) {
+                if (response.isSuccessful) {
+                    val updatedTask = response.body()
+                    
+                    updatedTask?.let {
+                        // Log detailed task information after API call
+                        it.logTaskDetails(TAG)
+                        Log.d(TAG, "Pin toggled successfully. New isPinned: ${it.isPinned}")
+                        
+                        // Check if the pin state was actually toggled as expected
+                        if (it.isPinned == expectedPinnedState) {
+                            val message = if (it.isPinned) "Task pinned" else "Task unpinned"
+                            // Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.w(TAG, "Server returned unexpected pin state. Expected: $expectedPinnedState, Actual: ${it.isPinned}")
+                            // Toast.makeText(context, "Task updated", Toast.LENGTH_SHORT).show()
+                        }
+                    } ?: run {
+                        Log.e(TAG, "Successful response but body is null")
+                    }
+                    
+                    fetchTasks()  // Refresh the task list
+                } else {
+                    Log.e(TAG, "Error toggling pin: ${response.code()}")
+                    val errorBody = response.errorBody()?.string()
+                    Log.e(TAG, "Error body: $errorBody")
+                    // Toast.makeText(context, "Error updating task", Toast.LENGTH_SHORT).show()
+                }
+            }
+            
+            override fun onFailure(call: Call<Task>, t: Throwable) {
+                Log.e(TAG, "Failed to toggle pin", t)
+                // Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }

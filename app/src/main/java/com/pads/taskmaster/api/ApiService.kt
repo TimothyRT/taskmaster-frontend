@@ -40,4 +40,8 @@ interface ApiService {
     // Mark task as done
     @PUT("tasks/{taskId}/done")
     fun markTaskAsDone(@Path("taskId") taskId: String): Call<Task>
+    
+    // Toggle task pin status
+    @PUT("tasks/pin/{taskId}")
+    fun toggleTaskPin(@Path("taskId") taskId: String): Call<Task>
 } 

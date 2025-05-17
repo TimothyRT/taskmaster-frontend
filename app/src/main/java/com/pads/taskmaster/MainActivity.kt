@@ -42,16 +42,16 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val tasks = response.body()
                     Log.d(TAG, "Tasks fetched successfully: $tasks")
-                    Toast.makeText(this@MainActivity, "Tasks fetched successfully", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(this@MainActivity, "Tasks fetched successfully", Toast.LENGTH_SHORT).show()
                 } else {
                     Log.e(TAG, "Error fetching tasks: ${response.code()}")
-                    Toast.makeText(this@MainActivity, "Error fetching tasks: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(this@MainActivity, "Error fetching tasks: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
             }
             
             override fun onFailure(call: Call<List<Task>>, t: Throwable) {
                 Log.e(TAG, "API call failed", t)
-                Toast.makeText(this@MainActivity, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
+                // Toast.makeText(this@MainActivity, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         
-//        setupActionBarWithNavController(navController)
+        setupActionBarWithNavController(navController)
     }
     
     override fun onSupportNavigateUp(): Boolean {

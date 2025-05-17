@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="@dimen/card_margin"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
@@ -34,7 +34,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/taskTitle"
-            tools:text="Task description goes here. This can be a longer text that describes the details of the task." />
+            tools:text="Task description goes here! :3" />
 
         <TextView
             android:id="@+id/taskCategory"
@@ -90,12 +90,21 @@
             app:layout_constraintTop_toBottomOf="@+id/taskCategory">
 
             <ImageButton
-                android:id="@+id/editButton"
+                android:id="@+id/pinButton"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Pin task"
+                android:src="@drawable/ic_bookmark_fill" />
+
+            <ImageButton
+                android:id="@+id/editButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Edit task"
-                android:src="@android:drawable/ic_menu_edit" />
+                android:src="@drawable/ic_edit" />
 
             <ImageButton
                 android:id="@+id/doneButton"
@@ -103,8 +112,8 @@
                 android:layout_height="36dp"
                 android:layout_marginStart="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Mark as done"
-                android:src="@android:drawable/checkbox_on_background" />
+                android:contentDescription="Mark task as done"
+                android:src="@drawable/ic_check" />
 
             <ImageButton
                 android:id="@+id/deleteButton"
@@ -113,7 +122,7 @@
                 android:layout_marginStart="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Delete task"
-                android:src="@android:drawable/ic_menu_delete" />
+                android:src="@drawable/ic_trash" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

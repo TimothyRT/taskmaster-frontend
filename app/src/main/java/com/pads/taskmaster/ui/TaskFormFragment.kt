@@ -10,6 +10,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -55,6 +56,9 @@ class TaskFormFragment : Fragment() {
         categoryRadioGroup = view.findViewById(R.id.categoryRadioGroup)
         saveButton = view.findViewById(R.id.saveButton)
         
+        // Enable back button in action bar
+        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        
         // Set up save button
         saveButton.setOnClickListener {
             saveTask()
@@ -87,13 +91,13 @@ class TaskFormFragment : Fragment() {
                         }
                     } else {
                         Log.e(TAG, "Error loading task: ${response.code()}")
-                        Toast.makeText(context, "Error loading task details", Toast.LENGTH_SHORT).show()
+                        // Toast.makeText(context, "Error loading task details", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<Task>, t: Throwable) {
                     Log.e(TAG, "Failed to load task", t)
-                    Toast.makeText(context, "Failed to load task: ${t.message}", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(context, "Failed to load task: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
         }
@@ -133,17 +137,17 @@ class TaskFormFragment : Fragment() {
         RetrofitClient.apiService.createTask(task).enqueue(object : Callback<Task> {
             override fun onResponse(call: Call<Task>, response: Response<Task>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "Task created successfully", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(context, "Task created successfully", Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack()
                 } else {
                     Log.e(TAG, "Error creating task: ${response.code()}")
-                    Toast.makeText(context, "Error creating task", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(context, "Error creating task", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<Task>, t: Throwable) {
                 Log.e(TAG, "Failed to create task", t)
-                Toast.makeText(context, "Failed to create task: ${t.message}", Toast.LENGTH_SHORT).show()
+                // Toast.makeText(context, "Failed to create task: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -153,17 +157,17 @@ class TaskFormFragment : Fragment() {
             RetrofitClient.apiService.updateTask(id, task).enqueue(object : Callback<Task> {
                 override fun onResponse(call: Call<Task>, response: Response<Task>) {
                     if (response.isSuccessful) {
-                        Toast.makeText(context, "Task updated successfully", Toast.LENGTH_SHORT).show()
+                        // Toast.makeText(context, "Task updated successfully", Toast.LENGTH_SHORT).show()
                         findNavController().popBackStack()
                     } else {
                         Log.e(TAG, "Error updating task: ${response.code()}")
-                        Toast.makeText(context, "Error updating task", Toast.LENGTH_SHORT).show()
+                        // Toast.makeText(context, "Error updating task", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<Task>, t: Throwable) {
                     Log.e(TAG, "Failed to update task", t)
-                    Toast.makeText(context, "Failed to update task: ${t.message}", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(context, "Failed to update task: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
         }

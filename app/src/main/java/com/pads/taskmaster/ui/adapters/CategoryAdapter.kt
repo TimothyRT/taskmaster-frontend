@@ -11,6 +11,7 @@ import com.pads.taskmaster.model.TaskCategory
 
 class CategoryAdapter(
     private val categories: List<TaskCategory>,
+    private val taskCounts: Map<String, Int>,
     private val onCategoryClick: (TaskCategory) -> Unit
 ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
@@ -22,7 +23,7 @@ class CategoryAdapter(
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         val category = categories[position]
-        holder.bind(category)
+        holder.bind(category, taskCounts[category.id] ?: 0)
         holder.itemView.setOnClickListener {
             onCategoryClick(category)
         }
@@ -33,10 +34,13 @@ class CategoryAdapter(
     class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val categoryIcon: ImageView = itemView.findViewById(R.id.categoryIcon)
         private val categoryName: TextView = itemView.findViewById(R.id.categoryName)
+        private val taskCount: TextView = itemView.findViewById(R.id.taskCount)
 
-        fun bind(category: TaskCategory) {
+        fun bind(category: TaskCategory, count: Int) {
             categoryName.text = category.displayName
             categoryIcon.setImageResource(category.iconResId)
+            taskCount.text = count.toString()
+            taskCount.visibility = if (count > 0) View.VISIBLE else View.GONE
         }
     }
 } 
