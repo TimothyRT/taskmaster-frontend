@@ -98,11 +98,13 @@ class TaskAdapter(
                 pinButton.setImageResource(R.drawable.ic_bookmark_nofill)
             }
             
-            // Hide done button for tasks already marked as done
+            // Hide done and delete buttons for tasks already marked as done
             if (task.status == "Done") {
                 doneButton.visibility = View.GONE
+                deleteButton.visibility = View.GONE
             } else {
                 doneButton.visibility = View.VISIBLE
+                deleteButton.visibility = View.VISIBLE
             }
             
             // Hide all action buttons for deleted tasks
@@ -114,7 +116,6 @@ class TaskAdapter(
             } else {
                 pinButton.visibility = View.VISIBLE
                 editButton.visibility = View.VISIBLE
-                deleteButton.visibility = View.VISIBLE
             }
             
             // Set click listeners
